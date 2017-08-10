@@ -30,6 +30,29 @@ app.get('/api/beta/:betaId', (req,res) => {
 	})
 })
 
+app.get('/api/beta/casino/:betaId', (req,res) => {
+	let betaId = req.params.betaId
+
+	Beta.findById(betaId, (err, beta) => {
+		if (err) return res.status(500).send({message: 'Error: '+err})	
+		if (!beta) return res.status(404).send({message: 'Betao inexistente'})	
+		res.status(200).send({beta: beta.tinkets.casino[0].estado})
+	})
+})
+
+app.get('/api/beta/validar/:betaId', (req,res) => {
+	let betaId = req.params.betaId
+
+	Beta.findById(betaId,  (err, beta) => {
+		if (err) return res.status(500).send({message: 'Error: '+err})	
+		if (!beta) return res.status(404).send({message: 'Betao inexistente'})
+		beta.tinkets.casino[0].estado = 'usado'	
+		res.status(200).send({beta: beta})
+		beta.save()
+
+	})
+})
+
 app.post('/api/beta', (req,res) => {
 	console.log('POST /api/beta')
 	console.log(req.body)
@@ -45,6 +68,15 @@ app.post('/api/beta', (req,res) => {
 })
 
 app.put('/api/beta/:betaId', (req,res) => {
+	let betaId = req.params.betaId
+	let update = req.body
+	Beta.findByIdAndUpdate(betaId, update, (err, betaUpdated) => {
+		if (err) res.status(500).send({message: 'Error:' + err})
+		res.status(200).send({beta: betaUpdated })
+	})
+})
+
+app.put('/api/beta/validar/:betaId', (req,res) => {
 	let betaId = req.params.betaId
 	let update = req.body
 	Beta.findByIdAndUpdate(betaId, update, (err, betaUpdated) => {
